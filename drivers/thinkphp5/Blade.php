@@ -16,6 +16,9 @@ use think\exception\TemplateNotFoundException;
 use think\Loader;
 use think\Log;
 use think\Request;
+use Xiaoler\Blade\Compilers\BladeCompiler;
+use Xiaoler\Blade\Engines\CompilerEngine;
+use Xiaoler\Blade\FileViewFinder;
 
 class Blade
 {
@@ -27,6 +30,10 @@ class Blade
         'view_base'   => '',
         // 模板起始路径
         'view_path'   => '',
+        'tpl_begin'   => '{{',
+        'tpl_end'   => '}}',
+        'tpl_raw_begin'   => '{!!',
+        'tpl_raw_end'   => '!!}',
         'view_cache_path'   => RUNTIME_PATH . 'temp' . DS, // 模板缓存目录
         // 模板文件后缀
         'view_suffix' => 'blade.php',
@@ -38,9 +45,12 @@ class Blade
             $this->config['view_path'] = App::$modulePath . 'view' . DS;
         }
 
-        $compiler = new \Xiaoler\Blade\Compilers\BladeCompiler($this->config['view_cache_path']);
-        $engine = new \Xiaoler\Blade\Engines\CompilerEngine($compiler);
-        $finder = new \Xiaoler\Blade\FileViewFinder([$this->config['view_path']], [$this->config['view_suffix']]);
+        $compiler = new BladeCompiler($this->config['view_cache_path']);
+        $compiler->setContentTags($this->config['tpl_begin'], $this->config['tpl_end'], true);
+        $compiler->setContentTags($this->config['tpl_begin'], $this->config['tpl_end'], false);
+        $compiler->setRawTags($this->config['tpl_raw_begin'], $this->config['tpl_raw_end'], false);
+        $engine = new CompilerEngine($compiler);
+        $finder = new FileViewFinder([$this->config['view_path']], [$this->config['view_suffix']]);
 
         // 实例化 Factory
         $this->template = new \Xiaoler\Blade\Factory($engine, $finder);
