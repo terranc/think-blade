@@ -40,6 +40,11 @@ class Blade
     ];
     public function __construct($config = [])
     {
+        $this->config($config);
+    }
+
+
+    private function boot($config = []) {
         $this->config = array_merge($this->config, $config);
         if (empty($this->config['view_path'])) {
             $this->config['view_path'] = App::$modulePath . 'view' . DS;
@@ -52,8 +57,21 @@ class Blade
         $compiler->setContentTags($this->config['tpl_begin'], $this->config['tpl_end'], true);
         $compiler->setContentTags($this->config['tpl_begin'], $this->config['tpl_end'], false);
         $compiler->setRawTags($this->config['tpl_raw_begin'], $this->config['tpl_raw_end'], false);
+
+        $compiler->directive('component', function($expression) {
+            return "<?php \$__env->startComponent{$expression}; ?>";
+        });
+        $compiler->directive('endcomponent', function () {
+            return '<?php echo $__env->renderComponent(); ?>';
+        });
+        $compiler->directive('slot', function ($expression) {
+            return "<?php \$__env->slot{$expression}; ?>";
+        });
+        $compiler->directive('endslot', function () {
+            return '<?php $__env->endSlot(); ?>';
+        });
         $engine = new CompilerEngine($compiler);
-        $finder = new FileViewFinder([$this->config['view_path']], [$this->config['view_suffix']]);
+        $finder = new FileViewFinder([$this->config['view_path'] . '/' . $this->config['']], [$this->config['view_suffix']]);
 
         // 实例化 Factory
         $this->template = new \Xiaoler\Blade\Factory($engine, $finder);
@@ -80,10 +98,12 @@ class Blade
      * @param string    $template 模板文件
      * @param array     $data 模板变量
      * @param array     $mergeData 附加变量
+     * @param array     $config 参数
      * @return void
      */
-    public function fetch($template, $data = [], $mergeData = [])
+    public function fetch($template, $data = [], $mergeData = [], $config = [])
     {
+        $this->config($config);
         if ('' == pathinfo($template, PATHINFO_EXTENSION)) {
             // 获取模板文件名
             $template = $this->parseTemplate($template);
@@ -103,10 +123,12 @@ class Blade
      * @param string    $template 模板内容
      * @param array     $data 模板变量
      * @param array     $mergeData 附加变量
+     * @param array     $config 参数
      * @return void
      */
-    public function display($template, $data = [], $mergeData = [])
+    public function display($template, $data = [], $mergeData = [], $config = [])
     {
+        $this->config($config);
         return $this->template->make($template, $data, $mergeData)->render();
     }
 
@@ -161,14 +183,13 @@ class Blade
     public function config($name, $value = null)
     {
         if (is_array($name)) {
-            $this->template->config($name);
             $this->config = array_merge($this->config, $name);
         } elseif (is_null($value)) {
-            return $this->template->config($name);
+            return $this->config[$name];
         } else {
-            $this->template->$name = $value;
             $this->config[$name]   = $value;
         }
+        $this->boot();
     }
 
     public function __call($method, $params)
