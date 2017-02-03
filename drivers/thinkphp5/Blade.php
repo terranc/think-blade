@@ -44,11 +44,10 @@ class Blade
         if (empty($this->config['view_path'])) {
             $this->config['view_path'] = App::$modulePath . 'view' . DS;
         }
-
-        $dir      = dirname($this->config['view_cache_path']);
-        if (!is_dir($dir)) {
-            mkdir($dir, 0755, true);
+        if (!is_dir($this->config['view_cache_path'])) {
+            mkdir($this->config['view_cache_path'], 0755, true);
         }
+
         $compiler = new BladeCompiler($this->config['view_cache_path']);
         $compiler->setContentTags($this->config['tpl_begin'], $this->config['tpl_end'], true);
         $compiler->setContentTags($this->config['tpl_begin'], $this->config['tpl_end'], false);
