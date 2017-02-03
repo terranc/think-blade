@@ -1,0 +1,25 @@
+{
+    "name": "terranc/think-blade",
+    "description": "think blade view engine",
+    "license": "Apache2",
+    "authors": [
+        {
+            "name": "terranc",
+            "email": "terran.chao@lookfeel.co"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/terranc/think-blade/issues"
+    },
+    "require": {
+        "php": ">=5.4.0",
+        "xiaoler/blade": "^0.3.1"
+    },
+    "autoload": {
+        "classmap": [
+            {
+                "think\\view\\driver\\Blade": "drivers/thinkphp5/Blade.php"
+            }
+        ]
+    }
+}
