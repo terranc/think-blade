@@ -21,6 +21,7 @@
             "url": "https://github.com/terranc/blade.git"
         }
     ],
+    "minimum-stability": "dev",
     "autoload": {
         "classmap": [
             {

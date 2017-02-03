@@ -71,7 +71,7 @@ class Blade
             return '<?php $__env->endSlot(); ?>';
         });
         $engine = new CompilerEngine($compiler);
-        $finder = new FileViewFinder([$this->config['view_path'] . '/' . $this->config['']], [$this->config['view_suffix']]);
+        $finder = new FileViewFinder([$this->config['view_path']], [$this->config['view_suffix']]);
 
         // 实例化 Factory
         $this->template = new \Xiaoler\Blade\Factory($engine, $finder);
