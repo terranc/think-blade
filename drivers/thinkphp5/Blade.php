@@ -28,6 +28,8 @@ class Blade
     protected $config = [
         // 视图基础目录（集中式）
         'view_base'   => '',
+        // 是否开启模板编译缓存,设为false则每次都会重新编译
+        'tpl_cache'          => true,
         // 模板起始路径
         'view_path'   => '',
         'tpl_begin'   => '{{',
