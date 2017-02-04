@@ -49,27 +49,12 @@ class Blade
         if (empty($this->config['view_path'])) {
             $this->config['view_path'] = App::$modulePath . 'view' . DS;
         }
-        if (!is_dir($this->config['view_cache_path'])) {
-            mkdir($this->config['view_cache_path'], 0755, true);
-        }
 
-        $compiler = new BladeCompiler($this->config['view_cache_path']);
+        $compiler = new BladeCompiler($this->config['view_cache_path'], $this->config['tpl_cache']);
         $compiler->setContentTags($this->config['tpl_begin'], $this->config['tpl_end'], true);
         $compiler->setContentTags($this->config['tpl_begin'], $this->config['tpl_end'], false);
         $compiler->setRawTags($this->config['tpl_raw_begin'], $this->config['tpl_raw_end'], false);
 
-        $compiler->directive('component', function($expression) {
-            return "<?php \$__env->startComponent{$expression}; ?>";
-        });
-        $compiler->directive('endcomponent', function () {
-            return '<?php echo $__env->renderComponent(); ?>';
-        });
-        $compiler->directive('slot', function ($expression) {
-            return "<?php \$__env->slot{$expression}; ?>";
-        });
-        $compiler->directive('endslot', function () {
-            return '<?php $__env->endSlot(); ?>';
-        });
         $engine = new CompilerEngine($compiler);
         $finder = new FileViewFinder([$this->config['view_path']], [$this->config['view_suffix']]);
 
