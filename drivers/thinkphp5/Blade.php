@@ -16,9 +16,10 @@ use think\exception\TemplateNotFoundException;
 use think\Loader;
 use think\Log;
 use think\Request;
-use Xiaoler\Blade\Compilers\BladeCompiler;
-use Xiaoler\Blade\Engines\CompilerEngine;
-use Xiaoler\Blade\FileViewFinder;
+use terranc\Blade\Compilers\BladeCompiler;
+use terranc\Blade\Engines\CompilerEngine;
+use terranc\Blade\FileViewFinder;
+use terranc\Blade\Factory;
 
 class Blade
 {
@@ -61,7 +62,7 @@ class Blade
         $finder = new FileViewFinder([$this->config['view_path']], [$this->config['view_suffix']]);
 
         // 实例化 Factory
-        $this->template = new \Xiaoler\Blade\Factory($engine, $finder);
+        $this->template = new Factory($engine, $finder);
     }
 
     /**
