@@ -59,7 +59,7 @@ class Blade
         $compiler->setRawTags($this->config['tpl_raw_begin'], $this->config['tpl_raw_end'], false);
 
         $engine = new CompilerEngine($compiler);
-        $finder = new FileViewFinder([$this->config['view_path']], [$this->config['view_suffix']]);
+        $finder = new FileViewFinder([$this->config['view_path']], [$this->config['view_suffix'], 'tpl']);
 
         // 实例化 Factory
         $this->template = new Factory($engine, $finder);
