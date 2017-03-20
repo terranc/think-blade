@@ -1,5 +1,5 @@
 # Think-Blade
-Blade template engine with thinkphp 5. 
+Blade template engine with thinkphp 5. (component & slot support)
 
 # Installation
 composer require terranc/think-blade
