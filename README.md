@@ -49,5 +49,7 @@ conig.php:
 ```
 
 # DOC
+
 https://laravel.com/docs/5.4/blade
+
 http://d.laravel-china.org/docs/5.4/blade (中文)
