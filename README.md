@@ -48,4 +48,6 @@ conig.php:
 </header>
 ```
 
-DOC: https://laravel.com/docs/5.4/blade
+# DOC
+https://laravel.com/docs/5.4/blade
+http://d.laravel-china.org/docs/5.4/blade (中文)
