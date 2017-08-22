@@ -52,6 +52,13 @@ class Blade
         if (empty($this->config['view_path'])) {
             $this->config['view_path'] = App::$modulePath . 'view' . DS;
         }
+        if ($this->config['cache']['cache_subdir']) {
+            // 使用子目录
+            $this->config['view_cache_path'] = $this->config['view_cache_path'] . DS . substr($this->config['view_cache_path'], 0, 2) . DS . substr($this->config['view_cache_path'], 2);
+        }
+        if ($this->options['cache']['prefix']) {
+            $name = $this->config['cache']['prefix'] . DS . $name;
+        }
 
         $compiler = new BladeCompiler($this->config['view_cache_path'], $this->config['tpl_cache']);
         $compiler->setContentTags($this->config['tpl_begin'], $this->config['tpl_end'], true);
