@@ -8,9 +8,7 @@
 // +----------------------------------------------------------------------
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
-
 namespace think\view\driver;
-
 use think\App;
 use think\exception\TemplateNotFoundException;
 use think\Loader;
@@ -20,6 +18,7 @@ use terranc\Blade\Compilers\BladeCompiler;
 use terranc\Blade\Engines\CompilerEngine;
 use terranc\Blade\FileViewFinder;
 use terranc\Blade\Factory;
+use think\facade\Env;
 
 class Blade
 {
@@ -37,7 +36,7 @@ class Blade
         'tpl_end'   => '}}',
         'tpl_raw_begin'   => '{!!',
         'tpl_raw_end'   => '!!}',
-        'view_cache_path'   => RUNTIME_PATH . 'temp' . DS, // 模板缓存目录
+        'view_cache_path'   => Env::get('runtime_path') . 'temp' . DIRECTORY_SEPARATOR, // 模板缓存目录
         // 模板文件后缀
         'view_suffix' => 'blade.php',
     ];
@@ -45,33 +44,27 @@ class Blade
     {
         $this->config($config);
     }
-
-
     private function boot($config = []) {
         $this->config = array_merge($this->config, $config);
         if (empty($this->config['view_path'])) {
-            $this->config['view_path'] = App::$modulePath . 'view' . DS;
+            $this->config['view_path'] = App::$modulePath . 'view' . DIRECTORY_SEPARATOR;
         }
         if ($this->config['cache']['cache_subdir']) {
             // 使用子目录
-            $this->config['view_cache_path'] = $this->config['view_cache_path'] . DS . substr($this->config['view_cache_path'], 0, 2) . DS . substr($this->config['view_cache_path'], 2);
+            $this->config['view_cache_path'] = $this->config['view_cache_path'] . DIRECTORY_SEPARATOR . substr($this->config['view_cache_path'], 0, 2) . DIRECTORY_SEPARATOR . substr($this->config['view_cache_path'], 2);
         }
         if ($this->options['cache']['prefix']) {
-            $name = $this->config['cache']['prefix'] . DS . $name;
+            $name = $this->config['cache']['prefix'] . DIRECTORY_SEPARATOR . $name;
         }
-
         $compiler = new BladeCompiler($this->config['view_cache_path'], $this->config['tpl_cache']);
         $compiler->setContentTags($this->config['tpl_begin'], $this->config['tpl_end'], true);
         $compiler->setContentTags($this->config['tpl_begin'], $this->config['tpl_end'], false);
         $compiler->setRawTags($this->config['tpl_raw_begin'], $this->config['tpl_raw_end'], false);
-
         $engine = new CompilerEngine($compiler);
         $finder = new FileViewFinder([$this->config['view_path']], [$this->config['view_suffix'], 'tpl']);
-
         // 实例化 Factory
         $this->template = new Factory($engine, $finder);
     }
-
     /**
      * 检测是否存在模板文件
      * @access public
@@ -86,7 +79,6 @@ class Blade
         }
         return is_file($template);
     }
-
     /**
      * 渲染模板文件
      * @access public
@@ -111,7 +103,6 @@ class Blade
         App::$debug && Log::record('[ VIEW ] ' . $template . ' [ ' . var_export(array_keys($data), true) . ' ]', 'info');
         echo $this->template->file($template, $data, $mergeData)->render();
     }
-
     /**
      * 渲染模板内容
      * @access public
@@ -126,7 +117,6 @@ class Blade
         $this->config($config);
         return $this->template->make($template, $data, $mergeData)->render();
     }
-
     /**
      * 自动定位模板文件
      * @access private
@@ -145,11 +135,10 @@ class Blade
         if ($this->config['view_base']) {
             // 基础视图目录
             $module = isset($module) ? $module : $request->module();
-            $path   = $this->config['view_base'] . ($module ? $module . DS : '');
+            $path   = $this->config['view_base'] . ($module ? $module . DIRECTORY_SEPARATOR : '');
         } else {
-            $path = isset($module) ? APP_PATH . $module . DS . 'view' . DS : $this->config['view_path'];
+            $path = isset($module) ? Env::get('app_path') . $module . DIRECTORY_SEPARATOR . 'view' . DIRECTORY_SEPARATOR : $this->config['view_path'];
         }
-
         $depr = $this->config['view_depr'];
         if (0 !== strpos($template, '/')) {
             $template   = str_replace(['/', ':'], $depr, $template);
@@ -157,9 +146,9 @@ class Blade
             if ($controller) {
                 if ('' == $template) {
                     // 如果模板文件名为空 按照默认规则定位
-                    $template = str_replace('.', DS, $controller) . $depr . $request->action();
+                    $template = str_replace('.', DIRECTORY_SEPARATOR, $controller) . $depr . $request->action();
                 } elseif (false === strpos($template, $depr)) {
-                    $template = str_replace('.', DS, $controller) . $depr . $template;
+                    $template = str_replace('.', DIRECTORY_SEPARATOR, $controller) . $depr . $template;
                 }
             }
         } else {
@@ -167,7 +156,6 @@ class Blade
         }
         return $path . ltrim($template, '/') . '.' . ltrim($this->config['view_suffix'], '.');
     }
-
     /**
      * 配置或者获取模板引擎参数
      * @access private
@@ -186,7 +174,6 @@ class Blade
         }
         $this->boot();
     }
-
     public function __call($method, $params)
     {
         return call_user_func_array([$this->template, $method], $params);
