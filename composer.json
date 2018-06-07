@@ -1,7 +1,7 @@
 {
     "name": "terranc/think-blade",
     "description": "think blade view engine",
-    "license": "Apache2",
+    "license": "Apache-2.0",
     "authors": [
         {
             "name": "terranc",
