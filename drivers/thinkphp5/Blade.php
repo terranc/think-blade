@@ -53,7 +53,7 @@ class Blade
             // 使用子目录
             $this->config['view_cache_path'] = $this->config['view_cache_path'] . DIRECTORY_SEPARATOR . substr($this->config['view_cache_path'], 0, 2) . DIRECTORY_SEPARATOR . substr($this->config['view_cache_path'], 2);
         }
-        if ($this->options['cache']['prefix']) {
+        if ($this->config['cache']['prefix']) {
             $name = $this->config['cache']['prefix'] . DIRECTORY_SEPARATOR . $name;
         }
         $compiler = new BladeCompiler($this->config['view_cache_path'], $this->config['tpl_cache']);
