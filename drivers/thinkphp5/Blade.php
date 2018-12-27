@@ -1,18 +1,9 @@
 <?php
-// +----------------------------------------------------------------------
-// | ThinkPHP [ WE CAN DO IT JUST THINK ]
-// +----------------------------------------------------------------------
-// | Copyright (c) 2006~2017 http://thinkphp.cn All rights reserved.
-// +----------------------------------------------------------------------
-// | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
-// +----------------------------------------------------------------------
-// | Author: liu21st <liu21st@gmail.com>
-// +----------------------------------------------------------------------
 namespace think\view\driver;
 use think\App;
 use think\exception\TemplateNotFoundException;
 use think\Loader;
-use think\Log;
+use think\facade\Log;
 use think\Request;
 use terranc\Blade\Compilers\BladeCompiler;
 use terranc\Blade\Engines\CompilerEngine;
@@ -36,7 +27,6 @@ class Blade
         'tpl_end'   => '}}',
         'tpl_raw_begin'   => '{!!',
         'tpl_raw_end'   => '!!}',
-        'view_cache_path'   => Env::get('runtime_path') . 'temp' . DIRECTORY_SEPARATOR, // 模板缓存目录
         // 模板文件后缀
         'view_suffix' => 'blade.php',
     ];
@@ -47,15 +37,9 @@ class Blade
     private function boot($config = []) {
         $this->config = array_merge($this->config, $config);
         if (empty($this->config['view_path'])) {
-            $this->config['view_path'] = App::$modulePath . 'view' . DIRECTORY_SEPARATOR;
+            $this->config['view_path'] = app()->getModulePath() . 'view' . DIRECTORY_SEPARATOR;
         }
-        if ($this->config['cache']['cache_subdir']) {
-            // 使用子目录
-            $this->config['view_cache_path'] = $this->config['view_cache_path'] . DIRECTORY_SEPARATOR . substr($this->config['view_cache_path'], 0, 2) . DIRECTORY_SEPARATOR . substr($this->config['view_cache_path'], 2);
-        }
-        if ($this->config['cache']['prefix']) {
-            $name = $this->config['cache']['prefix'] . DIRECTORY_SEPARATOR . $name;
-        }
+        $this->config['view_cache_path'] = Env::get('runtime_path') . 'temp' . DIRECTORY_SEPARATOR;
         $compiler = new BladeCompiler($this->config['view_cache_path'], $this->config['tpl_cache']);
         $compiler->setContentTags($this->config['tpl_begin'], $this->config['tpl_end'], true);
         $compiler->setContentTags($this->config['tpl_begin'], $this->config['tpl_end'], false);
@@ -100,7 +84,7 @@ class Blade
             throw new TemplateNotFoundException('template not exists:' . $template, $template);
         }
         // 记录视图信息
-        App::$debug && Log::record('[ VIEW ] ' . $template . ' [ ' . var_export(array_keys($data), true) . ' ]', 'info');
+        app()->isDebug() && Log::record('[ VIEW ] ' . $template . ' [ ' . var_export(array_keys($data), true) . ' ]', 'info');
         echo $this->template->file($template, $data, $mergeData)->render();
     }
     /**
@@ -126,7 +110,7 @@ class Blade
     private function parseTemplate($template)
     {
         // 分析模板文件规则
-        $request = Request::instance();
+        $request = request();
         // 获取视图根目录
         if (strpos($template, '@')) {
             // 跨模块调用
